@@ -1,0 +1,33 @@
+#include <stdio.h>
+
+
+main()
+{
+	char *a[10];
+	int i;
+
+	a[0] = "a";
+	a[1] = "e";
+	a[2] = "i";
+	a[3] = "o";
+	a[4] = "u";
+	a[5] = "A";
+	a[6] = "E";
+	a[7] = "I";
+	a[8] = "O";
+	a[9] = "U";
+
+
+	char let[333];
+	puts("inputa leter --> ");
+	scanf("%s", &let);
+
+	for(i=0; i<5; i++)
+	{
+	
+		printf("%s\n", a[i]);
+
+	}
+
+
+}

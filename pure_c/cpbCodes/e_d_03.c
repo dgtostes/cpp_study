@@ -17,7 +17,7 @@ int verify_sex(char sex[])
 
 main()
 {
-	char sex;
+	char sex[];
 	puts("input your sex (M)ale (F)emale ---> ");
 	scanf("%c", &sex);
 	verify_sex(sex);
