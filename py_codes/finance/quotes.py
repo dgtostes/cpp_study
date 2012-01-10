@@ -84,7 +84,17 @@ micos_list = ["KELP3",
 "FINAM11",
 "OGXP3",
 "TOYB4",
-"MILK11"]
+"MILK11",
+"SULA11",
+"DROG3",
+"IDNT3",
+"AMAR3",
+"AMIL3",
+"FRAS4",
+"CTKA4",
+"BTTL4",
+"VLID3"
+]
 
                          
 def generate_info_dict(instrument_list):
@@ -218,7 +228,27 @@ def portifolio_info(portifolio_dic):
 
 def quote(quote_list):
     for i in quote_list:
-        print "%s - %s" % (i,get_price(i+".SA"))
+        instrument_Y = i+".SA"
+        dic_p = get_all(instrument_Y)
+        try:
+            high = float(dic_p["52_week_high"])
+        except:
+            high = "*"
+
+        try:
+            low = float(dic_p["52_week_low"])
+
+        except:
+            low = "*"
+
+        today_price = float(dic_p["price"])
+
+
+
+	print "%s - high: %s - low: %s - today: %s" % (i,
+                                                       high,
+                                                       low,						                               today_price)
+                                                  
 
 def main():
     if len(sys.argv) == 2:
