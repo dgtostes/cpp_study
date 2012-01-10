@@ -28,7 +28,9 @@ def filter_in_file(file_name, string_to_match):
         else:
             line = line + 1
             i = f.readline()
-    
+    f.close()   
+
+ 
     if count_strikes == 0:
         print "file: %s - No matchs" % (file_name)
 
