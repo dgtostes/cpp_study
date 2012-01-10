@@ -209,7 +209,7 @@ def portifolio_info(portifolio_dic):
                                           profit_loss/operation_value)
         
 
-    total_profit_and_loss = total_profit_and_loss + profit_loss
+    	total_profit_and_loss = total_profit_and_loss + profit_loss
 
 
 
