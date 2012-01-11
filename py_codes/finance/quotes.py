@@ -165,19 +165,14 @@ def high_V_today(instrument_list):
                                                             check)   
 
 
-portifolio_dic = {"oper1":{"instrument": "GOLL4",
-                           "side": "B",
-                           "qty": 100,
-                           "price": 12.24,
-                           "date": "2012-01-05",
-                           "stop": {"qty": 100, "price": 13.40}},
-                  "oper2":{"instrument": "TNLP4",
+portifolio_dic = {"oper2":{"instrument": "TNLP4",
                            "side": "B",
                            "qty": 100,
                            "price": 17.90,
                            "date": "2012-01-06",
-                           "stop": {"qty": 100, "price": 19.00}}
+                           "stop": {"qty": 100, "price": 18.20}}
                   }
+
 
 def oper_cost_value(qty, price):
     return (qty*price)
