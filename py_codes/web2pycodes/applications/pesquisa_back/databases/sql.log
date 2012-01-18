@@ -1,0 +1,72 @@
+timestamp: 2012-01-17T17:34:19.060894
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    username CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+success!
+timestamp: 2012-01-17T17:34:19.233434
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2012-01-17T17:34:19.304904
+CREATE TABLE auth_membership(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    group_id INTEGER REFERENCES auth_group(id) ON DELETE CASCADE
+);
+success!
+timestamp: 2012-01-17T17:34:19.401732
+CREATE TABLE auth_permission(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_id INTEGER REFERENCES auth_group(id) ON DELETE CASCADE,
+    name CHAR(512),
+    table_name CHAR(512),
+    record_id INTEGER
+);
+success!
+timestamp: 2012-01-17T17:34:19.472040
+CREATE TABLE auth_event(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    time_stamp TIMESTAMP,
+    client_ip CHAR(512),
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    origin CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2012-01-17T17:34:19.568475
+CREATE TABLE auth_cas(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    created_on TIMESTAMP,
+    service CHAR(512),
+    ticket CHAR(512),
+    renew CHAR(1)
+);
+success!
+timestamp: 2012-01-17T17:34:19.643050
+CREATE TABLE campos(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    estado CHAR(300),
+    cidade CHAR(100),
+    nivel CHAR(100),
+    salario DOUBLE,
+    framework CHAR(100)
+);
+success!
+timestamp: 2012-01-18T08:11:28.674048
+ALTER TABLE auth_cas ADD url CHAR(512);
+timestamp: 2012-01-18T08:11:29.239491
+ALTER TABLE auth_cas ADD uuid CHAR(512);
+timestamp: 2012-01-18T08:14:35.114350
+ALTER TABLE campos ADD tipo CHAR(100);

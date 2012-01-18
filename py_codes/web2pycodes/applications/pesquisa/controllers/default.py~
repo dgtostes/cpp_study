@@ -225,8 +225,7 @@ def resultado():
 		"state_list": state_list, 
 		"dic2":dic2, 
 		"dic_frame": dic_frame,
-		"dic_frame_salary": dic_frame_salary,
-		"frame_list": frame_list}
+		"dic_frame_salary": dic_frame_salary}
 
 def user():
     """

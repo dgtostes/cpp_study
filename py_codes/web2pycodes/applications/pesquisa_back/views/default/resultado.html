@@ -1,0 +1,17 @@
+{{extend 'layout.html'}}
+
+
+
+
+<table border="5">
+ <tr> <th>Estado</th><th>Media Salario Jr</th> <th>Media Salario Pleno</th> <th>Media Salario Senior</th> <th>Media Salario Outros</th></tr>
+ {{for state in state_list:}}
+ <tr>
+  <td>{{=state}}</td>
+  <td>{{=dic[state]["junior"]}}</td>
+  <td>{{=dic[state]["pleno"]}}</td>
+  <td>{{=dic[state]["senior"]}}</td>
+  <td>{{=dic[state]["outros"]}}</td>
+  </tr>
+ {{pass}}
+</table>

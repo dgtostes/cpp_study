@@ -2,7 +2,7 @@
 
 
 
-
+<h1>CLT</h1><br>
 <table border="5">
  <tr> <th>Estado</th><th>Media Salario Jr</th> <th>Media Salario Pleno</th> <th>Media Salario Senior</th> <th>Media Salario Outros</th></tr>
  {{for state in state_list:}}
@@ -15,3 +15,44 @@
   </tr>
  {{pass}}
 </table>
+
+<br>
+<h1>PJ</h1><br>
+<table border="5">
+ <tr> <th>Estado</th><th>Media Salario Jr</th> <th>Media Salario Pleno</th> <th>Media Salario Senior</th> <th>Media Salario Outros</th></tr>
+ {{for state in state_list:}}
+ <tr>
+  <td>{{=state}}</td>
+  <td>{{=dic2[state]["junior"]}}</td>
+  <td>{{=dic2[state]["pleno"]}}</td>
+  <td>{{=dic2[state]["senior"]}}</td>
+  <td>{{=dic2[state]["outros"]}}</td>
+  </tr>
+ {{pass}}
+</table>
+
+<br>
+<h1>Por Frameworks</h1><br>
+<table border="5">
+ <tr> <th>Framework</th><th>Media Salario</th></tr>
+ {{for f in frame_list:}}
+ <tr>
+  <td>{{=f}}</td>
+  <td>{{=dic_frame_salary[f]['avg']}}</td>
+  </tr>
+ {{pass}}
+</table>
+
+
+
+<br>
+<h1>FrameWorks</h1><br>
+
+<b>Django</b> - {{=dic_frame["Django"]}}<br> 
+<b>Pylons</b> - {{=dic_frame["Pylons"]}}<br>
+<b>Web2Py</b> - {{=dic_frame["Web2Py"]}}<br>
+<b>Plone</b> - {{=dic_frame["Plone"]}}<br>
+<b>Outros</b> - {{=dic_frame["Outros"]}}<br>
+<b>Total</b> - {{=dic_frame["Total"]}}<br>
+
+

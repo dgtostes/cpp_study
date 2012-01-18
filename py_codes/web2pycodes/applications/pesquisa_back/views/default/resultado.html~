@@ -1,0 +1,7 @@
+{{extend 'layout.html'}}
+
+{{for state in state_list:}}
+
+{{=dic[state]}}
+
+{{pass}}

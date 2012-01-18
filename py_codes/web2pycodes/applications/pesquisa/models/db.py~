@@ -83,7 +83,6 @@ state_list = ["AC",
 "TO"
 ]
 
-
 type_list = ["clt", 'pj']
 level_list = ["Junior", "Pleno", "Senior", "Outro"]
 frame_list = ['Django', 'Pylons', 'Web2Py', 'Plone', 'Outros']
@@ -92,12 +91,3 @@ Campos.estado.requires = IS_IN_SET(state_list)
 Campos.nivel.requires = IS_IN_SET(level_list)
 Campos.tipo.requires = IS_IN_SET(type_list)
 Campos.salario.requires = IS_NOT_EMPTY()
-
-
-def avg(number1, number2):
-    try:
-        return float(number1)/float(number2)
-    except:
-        return 0
-
-

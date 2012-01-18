@@ -1,0 +1,19 @@
+ <html>
+  <head>
+    <title>Pesquisa Salarios Python</title>
+    <hr>
+	Pesquisa Salarios Python<br>
+	  <a href='/pesquisa/default/index'>Formulario</a>|
+	  <a href='/pesquisa/default/resultado'>Resultado</a>
+	  </div>
+    <hr>
+    <body>
+        {{include}}
+     </body>
+
+     <hr>
+     <div align=RIGHT><a href='http://web2py.com/'>Powered By Web2py</a></div>
+     <div align=RIGHT><a href='http://br.linkedin.com/in/diegotostes '>Diego Tostes Linkedin Profile</a></div>
+     <hr>
+
+</html>
