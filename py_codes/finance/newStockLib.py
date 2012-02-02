@@ -56,5 +56,4 @@ def get_quote_from_instrument_list(instrument_list):
     
     
 if __name__ == "__main__":
-    #print get_quote_from_instrument("PETR4")
-    print get_quote_from_instrument_list(["PETR4","GOLL4"])
+    pass
