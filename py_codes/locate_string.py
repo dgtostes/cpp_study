@@ -4,7 +4,7 @@ import sys
 '''
 5 minutes to create this script
 this script is using to find a file with a string.
-is lique  "| grep" :)
+is like  "| grep" :)
 '''
 
 def lista_dir(diretorio):          
