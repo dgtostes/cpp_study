@@ -4,10 +4,10 @@ import sys
 '''
 5 minutes to create this script
 this script is using to find a file with a string.
-is like  "| grep" :)
+is like "| grep" :)
 '''
 
-def lista_dir(diretorio):          
+def lista_dir(diretorio):
     lista = []
     for filename in os.listdir(diretorio):
         lista.append(str(filename))
@@ -28,7 +28,7 @@ def filter_in_file(file_name, string_to_match):
         else:
             line = line + 1
             i = f.readline()
-    f.close()   
+    f.close()
 
  
     if count_strikes == 0:
@@ -36,15 +36,22 @@ def filter_in_file(file_name, string_to_match):
 
 
 if __name__ == "__main__":
-    dir = sys.argv[1]
-    string_to_match = sys.argv[2]
+    if sys.argv[1] == "help" and len(sys.argv) == 2:
+        print "python locate_string.py [dir] word all"
+        print "python locate_string.py [dir] word '[\"ext1\", \"ext2\"]"
 
-    #print dir
-    #print string_to_match
-    elementos_dir = lista_dir(dir)
+    elif len(sys.argv) == 4:
+        dir = sys.argv[1]
+        string_to_match = sys.argv[2]
+        ext_list = eval(sys.argv[3])
 
-    for i in elementos_dir:
-        if ".js" in i or ".php" in i or ".html" in i:
-            filter_in_file(dir+i,string_to_match)
+        elementos_dir = lista_dir(dir)
 
+        for i in elementos_dir:
+            if sys.argv[3] == "all":
+                filter_in_file(dir+i,string_to_match)
 
+            else:
+                for ext in ext_list:
+                    if ext in i:
+                        filter_in_file(dir+i,string_to_match)
