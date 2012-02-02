@@ -6,6 +6,25 @@ import urllib
 from xml.dom import minidom
 from lxml import etree
 from BeautifulSoup import BeautifulStoneSoup
+import datetime
+
+def process_float_string(float_string):
+	if "," in float_string:
+		float_string = float_string.replace(",",".")
+	return float(float_string)
+	
+def process_bovespa_xml_date_string(bovespa_xml_date_string):
+	date_string = bovespa_xml_date_string[0:10]
+	try:
+		date_list = date_string.split("/")
+		day = int(date_list[0])
+		month = int(date_list[1])
+		year = int(date_list[2])
+		return datetime.date(year,month,day)
+	except:
+		return datetime.date.today()
+	
+	
 
 def get_quote_from_instrument(instrument):
     url = "http://www.bmfbovespa.com.br/cotacoes2000/formCotacoesMobile.asp?codsocemi=%s"
@@ -34,26 +53,26 @@ def get_quote_from_instrument_list(instrument_list):
     texto = urllib.urlopen(url2)
     soup = BeautifulStoneSoup(texto)
     infos = soup.findAll('papel')
-    key_list = {"codigo":"code",
-                "nome": "instrument",
-                "ibovespa":"is_bovespa",
-                "data":"date",
-                "abertura":"open",
-                "minimo":"min",
-                "maximo":"max",
-                "medio":"avg",
-                "ultimo":"close",
-                "oscilacao":"osc",
-                "minino":"min2"}
     for info in infos:
-        dic = {}
-        for key in key_list:
-            dic[key_list[key]] = info[key]
-        list_2_return.append(dic)
+		try:
+			dic = {}
+			dic["instrument"] = info["codigo"].strip()
+			dic["name"] = info["nome"]
+			dic["is_bovespa"] = info["ibovespa"]
+			dic["date"] = process_bovespa_xml_date_string(info["data"])
+			dic["open"] = process_float_string(info["abertura"])
+			dic["min"] = process_float_string(info["minimo"])
+			dic["max"] = process_float_string(info["maximo"])
+			dic["avg"] = process_float_string(info["medio"])
+			dic["close"] = process_float_string(info["ultimo"])
+			dic["osc"] = process_float_string(info["oscilacao"])
+			dic["min2"] = process_float_string(info["minimo"])
+			list_2_return.append(dic)
+		except:
+			pass
         
-    return list_2_return          
-        
-    
-    
+    return list_2_return
+                
 if __name__ == "__main__":
+    #print get_quote_from_instrument_list(["goll4"])
     pass
