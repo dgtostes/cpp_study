@@ -64,7 +64,7 @@ def get_quote_from_instrument_list(instrument_list):
 			dic["min"] = process_float_string(info["minimo"])
 			dic["max"] = process_float_string(info["maximo"])
 			dic["avg"] = process_float_string(info["medio"])
-			dic["close"] = process_float_string(info["ultimo"])
+			dic["last_price"] = process_float_string(info["ultimo"])
 			dic["osc"] = process_float_string(info["oscilacao"])
 			dic["min2"] = process_float_string(info["minimo"])
 			list_2_return.append(dic)
