@@ -1,5 +1,6 @@
 from newStockLib import *
 import sys
+import os
 
 ibov_list = ["VALE5",
 "OGXP3",
@@ -128,10 +129,28 @@ def quote_analysis(instrument_l):
 	for osc in order_osc_list:
 		for dic in dic_osc[osc]:
 			expose_dic(dic)
-	
 
+def qsave(instrument_l, file2save):
+    quote_info_list = get_quote_from_instrument_list(instrument_l)
+    for dic_info in quote_info_list:
+        line = "%s|%s|%.2f|%.2f|%.2f|%.2f|%.2f" % \
+                                                (dic_info['date'],
+                                                 dic_info['instrument'],
+                                                 dic_info['open'],
+                                                 dic_info['max'],
+                                                 dic_info['min'],
+                                                 dic_info['last_price'],
+                                                 dic_info['osc'])
+
+        write_line(file2save, line)
+
+def write_line(file_2_write, line):
+    f = open(file_2_write, 'a')
+    f.write("%s\n" % line)
+    f.close()        
 						 
 def main():
+        current_dir = os.getcwd()
 	if len(sys.argv) == 2:
 		if sys.argv[1] == 'all':
 			expose_quotes(ibov_list+micos_list)
@@ -142,6 +161,10 @@ def main():
 
 		elif sys.argv[1] == 'analysis':
 			print quote_analysis(ibov_list+micos_list)
+
+                elif sys.argv[1] == 'qsave':
+                        qsave(ibov_list+micos_list, current_dir+'/history_quotes.txt')
+
 		else:
 			expose_quotes[eval(sys.argv[1])]
 
