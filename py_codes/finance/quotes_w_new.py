@@ -4,159 +4,127 @@ import os
 import datetime
 import math
 
+class Quotes(object):
+	'''
+	a class that receives a dic_info and
+	a history quote file
+	'''
+	def __init__(self, dic_info, history_file):
+		self.dic_info = dic_info
+		self.history_file = history_file
+		self.expose = self.__expose_dic()
+		
+	
+	def __expose_dic(self):
+		'''
+		this method return a string 
+		whith quote informations abou the instrument
+		'''
+		return "intrument: %s open: %.2f max: %.2f min: %.2f"\
+			  "  last_price: %.2f osc: %.2f slope: %s deg: %s" %  (self.dic_info['instrument'],
+													 self.dic_info['open'],
+													 self.dic_info['max'],
+													 self.dic_info['min'],
+													 self.dic_info['last_price'],
+													 self.dic_info['osc'],
+													 self.__history_analysis()['slope'],
+													 self.__history_analysis()['a_tan_deg'])
+ 
+	def __quote_save(self):
+		'''
+		this method save quote informations
+		in the history_file file
+		'''
+		line = "%s|%s|%.2f|%.2f|%.2f|%.2f|%.2f" % (self.dic_info['date'],
+                                                 self.dic_info['instrument'],
+                                                 self.dic_info['open'],
+                                                 self.dic_info['max'],
+                                                 self.dic_info['min'],
+                                                 self.dic_info['last_price'],
+                                                 self.dic_info['osc'])
+		
+		write_line(self.history_file,line)
+        
 
-ibov_list = ["VALE5",
-"OGXP3",
-"ITUB4",
-"BVMF3",
-"BBDC4",
-"BBAS3",
-"GGBR4",
-"PETR3",
-"VALE3",
-"PDGR3",
-"USIM5",
-"ITSA4",
-"CYRE3",
-"MRVE3",
-"GFSA3",
-"CSNA3",
-"HYPE3",
-"BRFS3",
-"CIEL3",
-"AMBV4",
-"RDCD3",
-"MMXM3",
-"RSID3",
-"LREN3",
-"SANB11",
-"LAME4",
-"TIMP3",
-"NATU3",
-"CMIG4",
-"PCAR4",
-"ALLL3",
-"TLPP4",
-"FIBR3",
-"GOAU4",
-"BRAP4",
-"JBSS3",
-"BRML3",
-"CCRO3",
-"GOLL4",
-"CSAN3",
-"BISA3",
-"ELPL4",
-"MRFG3",
-"TNLP4",
-"BRKM5",
-"ELET3",
-"CPLE6",
-"ECOD3",
-"HGTX3",
-"ELET6",
-"LIGT3",
-"CESP6",
-"EMBR3",
-"KLBN4",
-"LLXL3",
-"DTEX3",
-"UGPA3",
-"CRUZ3",
-"TAMM4",
-"BTOW3",
-"USIM3",
-"CPFE3",
-"BRTO4",
-"SBSP3",
-"TNLP3",
-"TRPL4",
-"TMAR5",
-"PETR4",
-"RPMG4",
-"RPMG3"]
+	def __history_dic(self):
+		'''
+		this method return a history dictionary
+		from instrument using the history_file data
+		'''		
+		#date|instrument|open|max|min|last_price|osc
+		f = open(self.history_file,'r')
+		i = f.readline()
+		i = f.readline()#did this to skip from the head line
+		history_dic = {}
+		history_dic[self.dic_info['instrument']] = {}
+		while i:
+			line = i.strip()
+			line_list = line.split('|')
+			instrument = line_list[1]
+			if instrument == self.dic_info['instrument']:
+				date = process_date_string(line_list[0])	    
+				open_price = float(line_list[2])
+				max_price = float(line_list[3])
+				min_price = float(line_list[4])
+				close_price = float(line_list[5])
+				osc = float(line_list[6])
+				history_dic[instrument][date] = {'open_price':open_price,
+												 'max_price':max_price,
+												 'min_price':min_price,
+												 'close_price':close_price,
+												 'osc':osc}
+													 
+			i = f.readline()
+		f.close()
+		return history_dic
+		
+	def __history_analysis(self):
+		'''
+		this method process the __history_dic
+		generate a coordinate of the points of the 
+		history quote curve and using the best_line_apx
+		function, return informations about the best 
+		Straight-Line Equation that that approximates the points
+		of the quote curve
+		'''
+		instrument = self.dic_info['instrument']
+		history_dic = self.__history_dic()
+		date_list = [i for i in history_dic[instrument]]
+		date_list = sorted(date_list)
+		coord_list = []
+		for i in date_list:
+			coord_list.append((date_list.index(i),history_dic[instrument][i]['close_price']))
+		return best_line_apx(coord_list)
 
-
-micos_list = ["KELP3",
-"BMIN4",
-"SNSYS5",
-"EUCA4",
-"AGEN11",
-"MNDL4",
-"ECOD3",
-"FINAM11",
-"OGXP3",
-"TOYB4",
-"MILK11",
-"SULA11",
-"DROG3",
-"IDNT3",
-"AMAR3",
-"AMIL3",
-"FRAS4",
-"CTKA4",
-"BTTL4",
-"VLID3"
-]
-
-
-def expose_dic(dic_info):
-    print "intrument: %s open: %.2f max: %.2f min: %.2f"\
-          "  last_price: %.2f osc: %.2f slope: %s deg: %s" %  (dic_info['instrument'],
-                                                 dic_info['open'],
-                                                 dic_info['max'],
-                                                 dic_info['min'],
-                                                 dic_info['last_price'],
-                                                 dic_info['osc'],
-                                                 history_analysis(dic_info['instrument'], 
-                                                                 'history_quotes.txt')['slope'],
-                                                 history_analysis(dic_info['instrument'],
-                                                                 'history_quotes.txt')['a_tan_deg']
-                                                )
-                                                 
-
-
-
+		
+def write_line(file2save, line):
+	f = open(file2save, 'a')
+	f.write("%s\n" % line)
+	f.close()
+                                                
 def expose_quotes(instrument_l):
 	quote_info_list = get_quote_from_instrument_list(instrument_l)
-	for quote_info in quote_info_list:
-		expose_dic(quote_info)
+	for dic_info in quote_info_list:
+		dic_info(quote_info)
 
 
 def quote_analysis(instrument_l):
-	quote_info_list = get_quote_from_instrument_list(instrument_l)
-	dic_osc = {}
-        dic_price = {}
-	for quote_info in quote_info_list:
-		try:
-			dic_osc[quote_info['osc']].append(quote_info)
-		except:
-			dic_osc[quote_info['osc']] = [quote_info]
-
-	order_osc_list = sorted([i for i in dic_osc])
-        
-	for osc in order_osc_list:
-		for dic in dic_osc[osc]:
-			expose_dic(dic)
-
-def qsave(instrument_l, file2save):
     quote_info_list = get_quote_from_instrument_list(instrument_l)
-    for dic_info in quote_info_list:
-        line = "%s|%s|%.2f|%.2f|%.2f|%.2f|%.2f" % \
-                                                (dic_info['date'],
-                                                 dic_info['instrument'],
-                                                 dic_info['open'],
-                                                 dic_info['max'],
-                                                 dic_info['min'],
-                                                 dic_info['last_price'],
-                                                 dic_info['osc'])
+    dic_osc = {}
+    dic_price = {}
+    for quote_info in quote_info_list:
+        try:
+            dic_osc[quote_info['osc']].append(quote_info)
+        except:
+            dic_osc[quote_info['osc']] = [quote_info]
 
-        write_line(file2save, line)
+    order_osc_list = sorted([i for i in dic_osc])
+        
+    for osc in order_osc_list:
+        for dic in dic_osc[osc]:
+            expose_dic(dic)
 
-def write_line(file_2_write, line):
-    f = open(file_2_write, 'a')
-    f.write("%s\n" % line)
-    f.close()        
+  
 
 def process_date_string(date_string):
     '''
@@ -168,37 +136,6 @@ def process_date_string(date_string):
     month = int(date_list[1])
     day = int(date_list[2])
     return datetime.date(year, month,day) 
-
-
-def generate_history_dic(history_file, instruments_list):
-    #date|instrument|open|max|min|last_price|osc
-    f = open(history_file,'r')
-    i = f.readline()
-    i = f.readline()#did this to skip from the head line
-    history_dic = {}
-    for instrument in instruments_list:
-        history_dic[instrument.upper()] = {}
-    while i:
-        line = i.strip()
-        line_list = line.split('|')
-        date = process_date_string(line_list[0])
-	instrument = line_list[1]
-        open_price = float(line_list[2])
-        max_price = float(line_list[3])
-        min_price = float(line_list[4])
-        close_price = float(line_list[5])
-        osc = float(line_list[6])
-	if instrument in instruments_list:
-            history_dic[instrument][date] = {'open_price':open_price,
-                                             'max_price':max_price,
-                                             'min_price':min_price,
-                                             'close_price':close_price,
-                                             'osc':osc}
-	i = f.readline()
-
-    f.close()
-
-    return history_dic
 
 def best_line_apx(points_coor_list):
     '''
@@ -230,7 +167,7 @@ def best_line_apx(points_coor_list):
     except:
         a = None
     try:    
-	b=(-sum_x*sum_y+n*sum_xy)/(n*sum_xx-sum_x*sum_x)
+		b=(-sum_x*sum_y+n*sum_xy)/(n*sum_xx-sum_x*sum_x)
     except:
         b = None
 
@@ -249,60 +186,12 @@ def best_line_apx(points_coor_list):
             'a_tan_rad':arc_tan_rad, 
             'a_tan_deg':arc_tan_deg}
 
-    #print "The required straight line is Y=%sX+(%s)"%(b,a)
 
-def history_analysis(instrument_string, history_file):
-    instruments_list = [instrument_string]
-    history_dic = generate_history_dic(history_file, 
-                                       instruments_list)
-    date_list = [i for i in history_dic[instrument_string]]
-    date_list = sorted(date_list)
-    coord_list = []
-    for i in date_list:
-        coord_list.append((date_list.index(i),
-                           history_dic[instrument_string][i]['close_price']))
 
-    return best_line_apx(coord_list)
-					 
-def main():
-        current_dir = os.getcwd()
-	if len(sys.argv) == 2:
-		if sys.argv[1] == 'all':
-			expose_quotes(ibov_list+micos_list)
-		elif sys.argv[1] == 'ibov':
-			expose_quotes(ibov_list)
-		elif sys.argv[1] == 'micos':
-			expose_quotes(micos_list)
-
-		elif sys.argv[1] == 'analysis':
-			print quote_analysis(ibov_list+micos_list)
-
-                elif sys.argv[1] == 'qsave':
-                        qsave(ibov_list+micos_list, current_dir+'/history_quotes.txt')
-               
-          	else:
-			expose_quotes[eval(sys.argv[1])]
-
-	elif len(sys.argv) == 3:
-		if sys.argv[1] == 'single':
-			expose_quotes([sys.argv[2]])
-
-                elif sys.argv[1] == 'hanalysis':
-                        instrument = sys.argv[2].upper()
-                        print history_analysis(instrument,
-                                                 current_dir+'/history_quotes.txt')
-		elif sys.argv[1] == 'hdic':
-                        instrument = sys.argv[2].upper()
-                         
-                        hdic = generate_history_dic(current_dir+'/history_quotes.txt', [instrument])
-                        date_list = [i for i in hdic[instrument]]
-                        date_list = sorted(date_list)
-                        for date in date_list:
-                            print "date: %s close: %s" % (date,hdic[instrument][date]['close_price'])
-                        print 'arc: %s' % history_analysis(instrument,
-                                                                 'history_quotes.txt')['a_tan_deg']
-						 
 if __name__ == "__main__":
-	main()
-        #print best_line_apx([(0,0),(1,2),(2,4),(3,6)])
-        #print history_analysis('PETR4', 'history_quotes.txt')
+	history_file = "history_quotes.txt"
+	dic_list = get_quote_from_instrument_list(ibov_list+micos_list)
+	for dic_info in dic_list:
+		quote = Quotes(dic_info, history_file)
+		print quote.expose
+
