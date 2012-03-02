@@ -3,6 +3,7 @@ import sys
 import os
 import datetime
 import math
+import urllib2
 
 class Quotes(object):
 	'''
@@ -13,6 +14,10 @@ class Quotes(object):
 		self.dic_info = dic_info
 		self.history_file = history_file
 		self.expose = self.__expose_dic()
+		self.history_dic = self.__history_dic()
+		self.history_line = self.__history_analysis()
+		#self.gera_arquivo = self.__gera_arquivo()
+		
 		
 	
 	def __expose_dic(self):
@@ -20,16 +25,78 @@ class Quotes(object):
 		this method return a string 
 		whith quote informations abou the instrument
 		'''
+		
+		if self.__history_analysis():
+			slope_quote = self.__history_analysis()['quote']['slope']
+			a_tan_deg_quote = self.__history_analysis()['quote']['a_tan_deg']
+			slope_vol = self.__history_analysis()['vol']['slope']
+			a_tan_deg_vol = self.__history_analysis()['vol']['a_tan_deg']
+		else:
+			slope_quote = None
+			a_tan_deg_quote = None
+			slope_vol = None
+			a_tan_deg_vol = None
+					
 		return "intrument: %s open: %.2f max: %.2f min: %.2f"\
-			  "  last_price: %.2f osc: %.2f slope: %s deg: %s" %  (self.dic_info['instrument'],
+			  " last_price: %.2f osc: %.2f slope: %.2f deg: %.2f"\
+			  " slope_vol: %.2f deg_vol: %.2f" %  (self.dic_info['instrument'],
 													 self.dic_info['open'],
 													 self.dic_info['max'],
 													 self.dic_info['min'],
 													 self.dic_info['last_price'],
 													 self.dic_info['osc'],
-													 self.__history_analysis()['slope'],
-													 self.__history_analysis()['a_tan_deg'])
- 
+													 slope_quote,
+													 a_tan_deg_quote,
+													 slope_vol,
+													 a_tan_deg_vol)
+	def __history_dic(self):
+		today = datetime.date.today()
+		today_day = today.day
+		today_month = today.month - 1
+		today_year = today.year
+		
+		start = today - datetime.timedelta(days=7)
+		start_day = start.day
+		start_month = start.month -1
+		start_year = start.year
+		url_target = "http://ichart.finance.yahoo.com/"\
+		             "table.csv?s=%s.SA&a=%s&b=%s&c=%s&d"\
+		             "=%s&e=%s&f=%s&g=d&ignore=.csv" % (self.dic_info['instrument'],
+														start_month,
+				                                        start_day,
+														start_year,
+														today_month,
+														today_day,
+														today_year)
+		try:
+			response = urllib2.urlopen(url_target)
+			html_list = (response.read()).split("\n")
+			html_list.pop(0)
+			html_list.pop(len(html_list)-1)
+			history_dic = {}
+			history_dic[self.dic_info['instrument']] = {}
+			for i in html_list:
+				data_list = i.split(',')
+				date = process_date_string(data_list[0])
+				history_dic[self.dic_info['instrument']][date] = {}		
+				open_price = float(data_list[1])
+				max_price = float(data_list[2])
+				min_price = float(data_list[3])
+				close_price = float(data_list[4])
+				osc = close_price - open_price
+				vol = float(data_list[5].replace(",",""))
+				history_dic[self.dic_info['instrument']][date] = {
+													 'max_price':max_price,
+													 'min_price':min_price,
+													 'close_price':close_price,
+													 'osc':osc,
+													 'vol':vol
+													 }
+														 
+			return history_dic
+		except:
+			return None
+
 	def __quote_save(self):
 		'''
 		this method save quote informations
@@ -46,37 +113,39 @@ class Quotes(object):
 		write_line(self.history_file,line)
         
 
-	def __history_dic(self):
-		'''
-		this method return a history dictionary
-		from instrument using the history_file data
-		'''		
-		#date|instrument|open|max|min|last_price|osc
-		f = open(self.history_file,'r')
-		i = f.readline()
-		i = f.readline()#did this to skip from the head line
-		history_dic = {}
-		history_dic[self.dic_info['instrument']] = {}
-		while i:
-			line = i.strip()
-			line_list = line.split('|')
-			instrument = line_list[1]
-			if instrument == self.dic_info['instrument']:
-				date = process_date_string(line_list[0])	    
-				open_price = float(line_list[2])
-				max_price = float(line_list[3])
-				min_price = float(line_list[4])
-				close_price = float(line_list[5])
-				osc = float(line_list[6])
-				history_dic[instrument][date] = {'open_price':open_price,
-												 'max_price':max_price,
-												 'min_price':min_price,
-												 'close_price':close_price,
-												 'osc':osc}
-													 
-			i = f.readline()
-		f.close()
-		return history_dic
+	
+#	def __history_dic(self):
+#		'''
+#		this method return a history dictionary
+#		from instrument using the history_file data
+#		'''		
+#		#date|instrument|open|max|min|last_price|osc
+#		f = open(self.history_file,'r')
+#		i = f.readline()
+#		i = f.readline()#did this to skip from the head line
+#		
+#		history_dic = {}
+#		history_dic[self.dic_info['instrument']] = {}
+#		while i:
+#			line = i.strip()
+#			line_list = line.split('|')
+#			instrument = line_list[1]
+#			if instrument == self.dic_info['instrument']:
+#				date = process_date_string(line_list[0])	    
+#				open_price = float(line_list[2])
+#				max_price = float(line_list[3])
+#				min_price = float(line_list[4])
+#				close_price = float(line_list[5])
+#				osc = float(line_list[6])
+#				history_dic[instrument][date] = {'open_price':open_price,
+#												 'max_price':max_price,
+#												 'min_price':min_price,
+#												 'close_price':close_price,
+#												 'osc':osc}
+#													 
+#			i = f.readline()
+#		f.close()
+#		return history_dic
 		
 	def __history_analysis(self):
 		'''
@@ -88,13 +157,22 @@ class Quotes(object):
 		of the quote curve
 		'''
 		instrument = self.dic_info['instrument']
-		history_dic = self.__history_dic()
-		date_list = [i for i in history_dic[instrument]]
-		date_list = sorted(date_list)
-		coord_list = []
-		for i in date_list:
-			coord_list.append((date_list.index(i),history_dic[instrument][i]['close_price']))
-		return best_line_apx(coord_list)
+		dic = {}
+		if self.__history_dic():
+			history_dic = self.__history_dic()
+			date_list = [i for i in history_dic[instrument]]
+			date_list = sorted(date_list)
+			coord_list_quote = []
+			coord_list_vol = []
+			for i in date_list:
+				coord_list_quote.append((date_list.index(i),history_dic[instrument][i]['close_price']))
+				coord_list_vol.append((date_list.index(i),history_dic[instrument][i]['vol']))
+			dic['quote'] = best_line_apx(coord_list_quote)
+			dic['vol'] = best_line_apx(coord_list_vol)
+			return dic	
+
+		else:
+			return None
 
 		
 def write_line(file2save, line):
@@ -189,9 +267,31 @@ def best_line_apx(points_coor_list):
 
 
 if __name__ == "__main__":
+	
 	history_file = "history_quotes.txt"
-	dic_list = get_quote_from_instrument_list(ibov_list+micos_list)
+	'''
+	dic_list = get_quote_from_instrument_list(["PETR4"])
+	print dic_list
 	for dic_info in dic_list:
 		quote = Quotes(dic_info, history_file)
-		print quote.expose
-
+		print quote.__history_dic()
+	'''
+	
+	
+	dic_list = get_quote_from_instrument_list(ibov_list+micos_list)
+	for dic_info in dic_list:
+		if dic_info['open'] > dic_info["last_price"]:
+			qty = 2960/dic_info["last_price"]
+			qty = int(qty / 100)*100
+			if qty > 100:
+				quote = Quotes(dic_info, history_file)
+				print "\n"
+				print quote.expose
+				print "da para comprar %s" % qty
+				lucro = qty * 0.01
+				print "lucro de %.2f por centavo" % lucro
+    
+#	dic_list = get_quote_from_instrument_list(["PETR4"])
+#	for dic_info in dic_list:
+#		quote = Quotes(dic_info, history_file)
+#		print quote.gera_arquivo
