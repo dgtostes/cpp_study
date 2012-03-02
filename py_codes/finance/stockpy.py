@@ -114,7 +114,6 @@ class Quotes(object):
                                                         today_month,
                                                         today_day,
                                                         today_year)
-        print url_target
         try:
             response = urllib2.urlopen(url_target)
             html_list = (response.read()).split("\n")
