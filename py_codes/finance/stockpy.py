@@ -10,12 +10,14 @@ class Quotes(object):
     a class that receives a dic_info and
     a history quote file
     '''
-    def __init__(self, instrument):
+    def __init__(self, instrument, history_gap):
+        self.history_gap = history_gap
         self.instrument = instrument
         self.dic_info = self.__get_quote_from_instrument_list()[0]
         self.history_dic = self.__history_dic()
         self.expose = self.__expose_dic()
         self.history_line = self.__history_analysis()
+
 
 
     def __get_quote_from_instrument_list(self):
@@ -101,7 +103,7 @@ class Quotes(object):
         today_month = today.month - 1
         today_year = today.year
 
-        start = today - datetime.timedelta(days=7)
+        start = today - datetime.timedelta(days=self.history_gap)
         start_day = start.day
         start_month = start.month -1
         start_year = start.year
@@ -272,5 +274,5 @@ def best_line_apx(points_coor_list):
 
 
 if __name__ == "__main__":
-    q = Quotes("PETR4")
+    q = Quotes("PETR4", 7)
     print q.expose
