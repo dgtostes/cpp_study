@@ -1,4 +1,7 @@
-from newStockLib import *
+import urllib
+from xml.dom import minidom
+from lxml import etree
+from BeautifulSoup import BeautifulStoneSoup
 import sys
 import os
 import datetime
@@ -274,5 +277,13 @@ def best_line_apx(points_coor_list):
 
 
 if __name__ == "__main__":
-    q = Quotes("PETR4", 7)
-    print q.expose
+    q1 = Quotes("PETR4", 360)
+    q2 = Quotes("PETR4", 180)
+    q3 = Quotes("PETR4", 90)
+    q4 = Quotes("PETR4", 30)
+    q5 = Quotes("PETR4", 7)
+    print q1.expose
+    print q2.expose
+    print q3.expose
+    print q4.expose
+    print q5.expose
